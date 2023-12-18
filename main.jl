@@ -105,9 +105,9 @@ function guess_distance(means::Vector{Float16},data::Float16,stdev::Vector{Float
         result[i] = (data - means[i])^2
     end
     index = sortperm(result)
-    if result[index[1]] < result[index[2]]*0.2
+    #if result[index[1]] < result[index[2]]*0.2
     #if result[index[1]] < stdev[index[1]] && result[index[2]] > stdev[index[2]]
-    #if result[index[1]] < stdev[index[1]]
+    if result[index[1]] < stdev[index[1]]^2
     #if result[index[2]] - result[index[1]] > stdev[index[1]]
         return index[1]
     else
@@ -176,7 +176,8 @@ result2_euclidian = zeros(Float64,3)
 @simd for i in 1:3
     result2_euclidian[i] = result_euclidian[i,i]/sum(result_euclidian[:,i])
 end
-println("Data dengan semua kolom: ")
+println("Data dengan euclidian distance semua kolom: ")
+display(result_euclidian)
 println(result2_euclidian)
 println(sum(result2_euclidian))
 println("")
@@ -184,9 +185,12 @@ order = sortperm(order_value, rev = true)
 stdev = zeros(Float16,3,4)
 copy_data_matrix = copy(data_matrix)
 copy_class_matrix = copy(class_matrix)
-println("Means and stdev before cascade:")
+println("Cascade order:")
+println(order)
+println("")
+println("Means before cascade:")
 display(means)
-display(stdev)
+println("")
 for i in eachindex(order)
     result = apply_cascade(copy_data_matrix,copy_class_matrix,means,stdev,order[i])
     global copy_data_matrix = result[1]
@@ -197,7 +201,9 @@ end
 println("Means and stdev after cascade:")
 display(means)
 display(stdev)
+println("")
 #result = prediction(data_matrix,class_matrix,means)
+println("Data dengan cascading semua kolom: ")
 result = guess(data_matrix,class_matrix,means,stdev,order)
 display(result)
 result2 = zeros(Float64,3)
